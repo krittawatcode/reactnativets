@@ -1,34 +1,50 @@
 import React, { useState } from "react";
-import { Button, StyleSheet, Text, TextInput, View } from "react-native";
+import { Button, StyleSheet, TextInput, View, FlatList } from "react-native";
+
+import GoalItem from "./components/GoalItem";
+
+interface goalInput {
+  text: string;
+  id: string;
+}
 
 export default function App() {
-  const [enteredCharacter, setEnteredCharacter] = useState("");
-  const [characters, setCharacters] = useState<string[]>([]);
+  const [enteredGoal, setEnteredGoal] = useState("");
+  const [goals, setGoals] = useState<goalInput[]>([]);
 
-  function characterInputHandler(enteredText: string) {
-    setEnteredCharacter(enteredText);
+  function goalInputHandler(enteredText: string) {
+    setEnteredGoal(enteredText);
   }
 
-  function addCharacterHandler() {
-    setCharacters((prevCharacters) => [...prevCharacters, enteredCharacter]);
+  function addGoalHandler() {
+    setGoals((prevCharacters) => [
+      ...prevCharacters,
+      {
+        text: enteredGoal,
+        id: Math.random().toString(),
+      } as goalInput,
+    ]);
   }
 
   return (
     <View style={styles.appContainer}>
       <View style={styles.inputContainer}>
         <TextInput
-          placeholder="Your Character Name"
+          placeholder="Your Goal"
           style={styles.textInput}
-          onChangeText={characterInputHandler}
+          onChangeText={goalInputHandler}
         />
-        <Button title="Submit" onPress={addCharacterHandler} />
+        <Button title="Submit" onPress={addGoalHandler} />
       </View>
-      <View style={styles.characterContainer}>
-        {characters.map((character) => (
-          <View key={character} style={styles.characterItem}>
-            <Text>{character}</Text>
-          </View>
-        ))}
+      <View style={styles.goalContainer}>
+        <FlatList
+          data={goals}
+          renderItem={(itemData) => {
+            return <GoalItem text={itemData.item.text} />;
+          }}
+          keyExtractor={(item, index) => item.id}
+          alwaysBounceVertical={false}
+        />
       </View>
     </View>
   );
@@ -61,14 +77,16 @@ const styles = StyleSheet.create({
     marginRight: 8,
     padding: 8,
   },
-  characterContainer: {
+  goalContainer: {
     flex: 5,
   },
-  characterItem: {
+  goalItem: {
     margin: 8,
     padding: 8,
     borderRadius: 6,
     backgroundColor: "#5e0acc",
+  },
+  goalText: {
     color: "white",
   },
 });
